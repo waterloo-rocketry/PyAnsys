@@ -1,0 +1,8 @@
+air density,1.1767
+air viscosity,0.00001009
+residual continuity,0.001
+residual x velocity,0.001
+residual y velocity,0.001
+residual k,0.001
+residual omega,0.001
+number of iterations,1000
