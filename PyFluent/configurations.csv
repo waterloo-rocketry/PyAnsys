@@ -1,8 +1,25 @@
-air density,1.1767
-air viscosity,0.00001009
-residual continuity,0.001
-residual x velocity,0.001
-residual y velocity,0.001
-residual k,0.001
-residual omega,0.001
-number of iterations,1000
+air_density,1.1767
+air_viscosity,0.00001009
+residual_continuity,1e-4
+residual_x_velocity,1e-4
+residual_y_velocity,1e-4
+residual_k,1e-4
+residual_omega,1e-4
+number_of_iterations,100
+reference_area,0.018241
+reference_density,1.225
+reference_enthalpy,0
+reference_length,0.152
+reference_pressure,0
+reference_temperature,288.16
+reference_velocity,274.4
+reference_viscosity,1.7894e-5
+reference_yplus,300
+lift_coef_monitor_zone,wall-enclosure_enclosure11
+lift_coef_monitor_x_vector,1
+lift_coef_monitor_y_vector,-1
+lift_coef_monitor_z_vector,0
+drag_coef_monitor_zone,wall-enclosure_enclosure11
+drag_coef_monitor_x_vector,1
+drag_coef_monitor_y_vector,-1
+drag_coef_monitor_z_vector,0

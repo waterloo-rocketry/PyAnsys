@@ -1,12 +1,6 @@
 import ansys.fluent.core as pyfluent
 import csv
 
-"""
-
-This is not for the rocket, but instead an airfoil, waiting for rocket parameters
-
-"""
-
 parameters = dict()
 
 with open('configurations.csv', 'r') as csvfile:
@@ -16,18 +10,38 @@ with open('configurations.csv', 'r') as csvfile:
         parameters[row[0]] = row[1]
 
 # values
-air_density = float(parameters['air density'])
-air_viscosity = float(parameters['air viscosity'])
-residual_continuity = parameters['residual continuity']
-residual_x_vel = parameters['residual x velocity']
-residual_y_vel = parameters['residual y velocity']
-residual_k = parameters['residual k']
-residual_omega = parameters['residual omega']
-num_of_iterations = int(parameters['number of iterations'])
+air_density = float(parameters['air_density'])
+air_viscosity = float(parameters['air_viscosity'])
 
+residual_continuity = parameters['residual_continuity']
+residual_x_vel = parameters['residual_x_velocity']
+residual_y_vel = parameters['residual_y_velocity']
+residual_k = parameters['residual_k']
+residual_omega = parameters['residual_omega']
+
+num_of_iterations = int(parameters['number_of_iterations'])
+
+reference_area = float(parameters['reference_area'])
+reference_density = float(parameters['reference_density'])
+reference_enthalpy = float(parameters['reference_enthalpy'])
+reference_length = float(parameters['reference_length'])
+reference_pressure = float(parameters['reference_pressure'])
+reference_temperature = float(parameters['reference_temperature'])
+reference_velocity = float(parameters['reference_velocity'])
+reference_viscosity = float(parameters['reference_viscosity'])
+reference_yplus = float(parameters['reference_yplus'])
+
+lift_coef_monitor_zone = parameters['lift_coef_monitor_zone']
+lift_coef_monitor_x_vector = parameters['lift_coef_monitor_x_vector']
+lift_coef_monitor_y_vector = parameters['lift_coef_monitor_y_vector']
+lift_coef_monitor_z_vector = parameters['lift_coef_monitor_z_vector']
+drag_coef_monitor_zone = parameters['drag_coef_monitor_zone']
+drag_coef_monitor_x_vector = parameters['drag_coef_monitor_x_vector']
+drag_coef_monitor_y_vector = parameters['drag_coef_monitor_y_vector']
+drag_coef_monitor_z_vector = parameters['drag_coef_monitor_z_vector']
 
 # launch session of fluent
-solver = pyfluent.launch_fluent(show_gui=False, precision='single', version='2d', mode='solver', product_version='23.2.0')
+solver = pyfluent.launch_fluent(show_gui=False, precision='single', version='3d', mode='solver', product_version='23.2.0')
 
 # read mesh file
 # add a .h5 is needed
@@ -37,8 +51,8 @@ solver.file.read_mesh(file_name='mesh_file.msh', file_type='mesh')
 solver.mesh.check()
 
 # change viscous model
-solver.setup.models.viscous.model = 'k-epsilon'
-solver.setup.models.viscous.k_epsilon_model = 'realizable'
+solver.setup.models.viscous.model = 'k-omega'
+solver.setup.models.viscous.k_omega_model = 'sst'
 
 # change density and viscosity of air
 solver.setup.materials.fluid['air'].density.value = air_density
@@ -46,23 +60,43 @@ solver.setup.materials.fluid['air'].viscosity.value = air_viscosity
 
 # update cell zone conditions to use air
 # this should be automatic but just in case
-solver.setup.cell_zone_conditions.fluid['surface_body'].material = 'air'
+solver.setup.cell_zone_conditions.fluid['enclosure_enclosure11'].material = 'air'
+solver.setup.cell_zone_conditions.fluid['geom_fin_boi'].material = 'air'
+solver.setup.cell_zone_conditions.fluid['geom_nosecone_boi'].material = 'air'
 
-# specify boundry conditions for farfield1
-solver.tui.define.boundary_conditions.modify_zones.zone_type('farfield1', 'velocity-inlet')
-solver.setup.boundary_conditions.velocity_inlet['farfield1'].velocity_spec = 'Components'
-solver.setup.boundary_conditions.velocity_inlet['farfield1'].velocity[0] = 5068
-solver.setup.boundary_conditions.velocity_inlet['farfield1'].velocity[1] = 8.6934
-
-# specify boundry conditions for farfield2, TUI
-solver.tui.define.boundary_conditions.modify_zones.zone_type('farfield2', 'pressure-outlet')
+# boundary conditions
+solver.tui.define.boundary_conditions.modify_zones.zone_type('contact_region-contact_region_2-src', 'interface')
+solver.tui.define.boundary_conditions.modify_zones.zone_type('contact_region-contact_region_2-trg-geom_fin_boi', 'interface')
+solver.tui.define.boundary_conditions.modify_zones.zone_type('contact_region-contact_region_2-trg-geom_nosecone_boi', 'interface')
+solver.tui.define.boundary_conditions.modify_zones.zone_type('inlet', 'velocity-inlet')
+solver.tui.define.boundary_conditions.modify_zones.zone_type('interior-11', 'interior')
+solver.tui.define.boundary_conditions.modify_zones.zone_type('interior-20', 'interior')
+solver.tui.define.boundary_conditions.modify_zones.zone_type('interior-21', 'interior')
+solver.tui.define.boundary_conditions.modify_zones.zone_type('interior-22', 'interior')
+solver.tui.define.boundary_conditions.modify_zones.zone_type('interior-23', 'interior')
+solver.tui.define.boundary_conditions.modify_zones.zone_type('interior-24', 'interior')
+solver.tui.define.boundary_conditions.modify_zones.zone_type('interior-enclosure_enclosure11', 'interior')
+solver.tui.define.boundary_conditions.modify_zones.zone_type('interior-geom_fin_boi', 'interior')
+solver.tui.define.boundary_conditions.modify_zones.zone_type('interior-geom_nosecone_boi', 'interior')
+solver.tui.define.boundary_conditions.modify_zones.zone_type('outlet', 'pressure-outlet')
+solver.tui.define.boundary_conditions.modify_zones.zone_type('symm1-contact_region-contact_region_2-src', 'interface')
+solver.tui.define.boundary_conditions.modify_zones.zone_type('symm2-contact_region-contact_region_2-src', 'interface')
+solver.tui.define.boundary_conditions.modify_zones.zone_type('wall', 'wall')
+solver.tui.define.boundary_conditions.modify_zones.zone_type('wall-25', 'wall')
+solver.tui.define.boundary_conditions.modify_zones.zone_type('wall-26', 'wall')
+solver.tui.define.boundary_conditions.modify_zones.zone_type('wall-27', 'wall')
+solver.tui.define.boundary_conditions.modify_zones.zone_type('wall-28', 'wall')
+solver.tui.define.boundary_conditions.modify_zones.zone_type('wall-29', 'wall')
+solver.tui.define.boundary_conditions.modify_zones.zone_type('wall-enclosure_enclosure11', 'wall')
+solver.tui.define.boundary_conditions.modify_zones.zone_type('wall-geom_fin_boi', 'wall')
+solver.tui.define.boundary_conditions.modify_zones.zone_type('wall-geom_nosecone_boi', 'wall')
 
 # lists all boundry condition zones and their types
 # mainly for debugging purposes
 solver.tui.define.boundary_conditions.list_zones()
 
-# change solution methods (momentum to first order)
-solver.solution.methods.discretization_scheme['mom'] = 'first-order-upwind'
+# change solution methods
+#solver.solution.methods.discretization_scheme['mom'] = 'first-order-upwind'
 
 # set convergence criteria
 # continuity, x-vel, y-vel, k, omega
@@ -83,19 +117,18 @@ solver.tui.solve.monitors.residual.convergence_criteria(residual_continuity, res
 # plot per zone? > no
 # x-component of lift vector > -0.1736
 # y-component of lift vector > 0.9848
-solver.tui.solve.monitors.force.set_lift_monitor('cl-1', 'yes', 'upper', 'lower', '()', 'yes', 'yes', '"cl-1-history"', 'no', 'no', '-0.1736', '0.9848')
+solver.tui.solve.monitors.force.set_lift_monitor('cl-1', 'yes', lift_coef_monitor_zone, '()', 'yes', 'yes', '"cl-1-history"', 'no', 'no', lift_coef_monitor_x_vector, lift_coef_monitor_y_vector, lift_coef_monitor_z_vector)
 
 # set reference values
-solver.setup.reference_values.area = 1
-solver.setup.reference_values.density = 1.1767
-solver.setup.reference_values.depth = 1
-solver.setup.reference_values.enthalpy = 0
-solver.setup.reference_values.length = 1
-solver.setup.reference_values.pressure = 0
-solver.setup.reference_values.temperature = 288.16
-solver.setup.reference_values.velocity = 51.44961
-solver.setup.reference_values.viscosity = 1.009e-5
-solver.setup.reference_values.yplus = 1.4
+solver.setup.reference_values.area = reference_area
+solver.setup.reference_values.density = reference_density
+solver.setup.reference_values.enthalpy = reference_enthalpy
+solver.setup.reference_values.length = reference_length
+solver.setup.reference_values.pressure = reference_pressure
+solver.setup.reference_values.temperature = reference_temperature
+solver.setup.reference_values.velocity = reference_velocity
+solver.setup.reference_values.viscosity = reference_viscosity
+solver.setup.reference_values.yplus = reference_yplus
 
 # Create drag coeff. monitor
 # >/solve/monitors/force/set-drag-monito
@@ -111,15 +144,10 @@ solver.setup.reference_values.yplus = 1.4
 # plpt per zone? > no
 # x-component of drag vector > 0.9848
 # y-component of drag vector > 0.1736
-solver.tui.solve.monitors.force.set_drag_monitor('cd-1', 'yes', 'lower', 'upper', '()', 'yes', 'yes', '"cd-1-history"', 'no', 'no', '0.9848', '0.1736')
+solver.tui.solve.monitors.force.set_drag_monitor('cd-1', 'yes', drag_coef_monitor_zone, '()', 'yes', 'yes', '"cd-1-history"', 'no', 'no', drag_coef_monitor_x_vector, drag_coef_monitor_y_vector, drag_coef_monitor_z_vector)
 
-# initialization values in standard initialization
-solver.solution.initialization.standard_initialize()
-solver.solution.initialization.defaults['pressure'] = 0  # gauge pressure
-solver.solution.initialization.defaults['x-velocity'] = 50.668
-solver.solution.initialization.defaults['y-velocity'] = 8.934
-solver.solution.initialization.defaults['k'] = 9.926485  # turbulent kinetic energy
-solver.solution.initialization.defaults['epsilon'] = 103420.8  # turbulent dissipation energy rate
+# initialization values in hybrid initialization
+solver.solution.initialization.hybrid_initialize()
 
 # initialize
 solver.solution.initialization.initialize()
