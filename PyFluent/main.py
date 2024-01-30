@@ -44,6 +44,11 @@ inlet_x_velocity = float(parameters['inlet_x_velocity'])
 inlet_y_velocity = float(parameters['inlet_y_velocity'])
 inlet_z_velocity = float(parameters['inlet_z_velocity'])
 
+roughness_constant = float(parameters['roughness_constant'])
+
+drag_file = '"cd-1"'
+lift_file = '"c-1"'
+
 # launch session of fluent
 solver = pyfluent.launch_fluent(show_gui=False, precision='single', version='3d', mode='solver', product_version='23.2.0', gpu=True)
 
@@ -72,6 +77,10 @@ solver.tui.define.boundary_conditions.modify_zones.zone_type('inlet', 'velocity-
 solver.tui.define.boundary_conditions.modify_zones.zone_type('interior--enclosure-enclosure', 'interior')
 solver.tui.define.boundary_conditions.modify_zones.zone_type('outlet', 'pressure-outlet')
 solver.tui.define.boundary_conditions.modify_zones.zone_type('wall', 'wall')
+
+solver.setup.boundary_conditions.wall['wall'].shear_bc = 'Specified Shear'  # specify shear condition
+solver.setup.boundary_conditions.wall['enclosure-enclosure:1'].roughness_const.value = roughness_constant # surface roughness
+
 
 # velocity inlet
 solver.setup.boundary_conditions.velocity_inlet['inlet'].velocity_spec = 'Components'
@@ -105,7 +114,7 @@ solver.tui.solve.monitors.residual.convergence_criteria(residual_continuity, res
 # plot per zone? > no
 # x-component of lift vector > -0.1736
 # y-component of lift vector > 0.9848
-solver.tui.solve.monitors.force.set_lift_monitor('cl-1', 'yes', lift_coef_monitor_zone, '()', 'yes', 'yes', '"cl-1-history"', 'no', 'no', lift_coef_monitor_x_vector, lift_coef_monitor_y_vector, lift_coef_monitor_z_vector)
+solver.tui.solve.monitors.force.set_lift_monitor('cl-1', 'yes', lift_coef_monitor_zone, '()', 'yes', 'yes', lift_file, 'no', 'no', lift_coef_monitor_x_vector, lift_coef_monitor_y_vector, lift_coef_monitor_z_vector)
 
 # set reference values
 solver.setup.reference_values.area = reference_area
@@ -132,7 +141,7 @@ solver.setup.reference_values.zone = 'enclosure-enclosure'
 # plpt per zone? > no
 # x-component of drag vector > 0.9848
 # y-component of drag vector > 0.1736
-solver.tui.solve.monitors.force.set_drag_monitor('cd-1', 'yes', drag_coef_monitor_zone, '()', 'yes', 'yes', '"cd-1-history"', 'no', 'no', drag_coef_monitor_x_vector, drag_coef_monitor_y_vector, drag_coef_monitor_z_vector)
+solver.tui.solve.monitors.force.set_drag_monitor('cd-1', 'yes', drag_coef_monitor_zone, '()', 'yes', 'yes', drag_file, 'no', 'no', drag_coef_monitor_x_vector, drag_coef_monitor_y_vector, drag_coef_monitor_z_vector)
 
 # initialization values in hybrid initialization
 solver.solution.initialization.hybrid_initialize()
