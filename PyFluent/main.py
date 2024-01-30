@@ -40,12 +40,16 @@ drag_coef_monitor_x_vector = parameters['drag_coef_monitor_x_vector']
 drag_coef_monitor_y_vector = parameters['drag_coef_monitor_y_vector']
 drag_coef_monitor_z_vector = parameters['drag_coef_monitor_z_vector']
 
+inlet_x_velocity = float(parameters['inlet_x_velocity'])
+inlet_y_velocity = float(parameters['inlet_y_velocity'])
+inlet_z_velocity = float(parameters['inlet_z_velocity'])
+
 # launch session of fluent
-solver = pyfluent.launch_fluent(show_gui=False, precision='single', version='3d', mode='solver', product_version='23.2.0')
+solver = pyfluent.launch_fluent(show_gui=False, precision='single', version='3d', mode='solver', product_version='23.2.0', gpu=True)
 
 # read mesh file
 # add a .h5 is needed
-solver.file.read_mesh(file_name='mesh_file.msh', file_type='mesh')
+solver.file.read_mesh(file_name='mesh_file.msh.h5', file_type='mesh')
 
 # check mesh
 solver.mesh.check()
@@ -60,36 +64,20 @@ solver.setup.materials.fluid['air'].viscosity.value = air_viscosity
 
 # update cell zone conditions to use air
 # this should be automatic but just in case
-solver.setup.cell_zone_conditions.fluid['enclosure_enclosure11'].material = 'air'
-solver.setup.cell_zone_conditions.fluid['geom_fin_boi'].material = 'air'
-solver.setup.cell_zone_conditions.fluid['geom_nosecone_boi'].material = 'air'
+solver.setup.cell_zone_conditions.fluid['enclosure-enclosure'].material = 'air'
 
 # boundary conditions
-solver.tui.define.boundary_conditions.modify_zones.zone_type('contact_region-contact_region_2-src', 'interface')
-solver.tui.define.boundary_conditions.modify_zones.zone_type('contact_region-contact_region_2-trg-geom_fin_boi', 'interface')
-solver.tui.define.boundary_conditions.modify_zones.zone_type('contact_region-contact_region_2-trg-geom_nosecone_boi', 'interface')
+solver.tui.define.boundary_conditions.modify_zones.zone_type('enclosure-enclosure:1', 'wall')
 solver.tui.define.boundary_conditions.modify_zones.zone_type('inlet', 'velocity-inlet')
-solver.tui.define.boundary_conditions.modify_zones.zone_type('interior-11', 'interior')
-solver.tui.define.boundary_conditions.modify_zones.zone_type('interior-20', 'interior')
-solver.tui.define.boundary_conditions.modify_zones.zone_type('interior-21', 'interior')
-solver.tui.define.boundary_conditions.modify_zones.zone_type('interior-22', 'interior')
-solver.tui.define.boundary_conditions.modify_zones.zone_type('interior-23', 'interior')
-solver.tui.define.boundary_conditions.modify_zones.zone_type('interior-24', 'interior')
-solver.tui.define.boundary_conditions.modify_zones.zone_type('interior-enclosure_enclosure11', 'interior')
-solver.tui.define.boundary_conditions.modify_zones.zone_type('interior-geom_fin_boi', 'interior')
-solver.tui.define.boundary_conditions.modify_zones.zone_type('interior-geom_nosecone_boi', 'interior')
+solver.tui.define.boundary_conditions.modify_zones.zone_type('interior--enclosure-enclosure', 'interior')
 solver.tui.define.boundary_conditions.modify_zones.zone_type('outlet', 'pressure-outlet')
-solver.tui.define.boundary_conditions.modify_zones.zone_type('symm1-contact_region-contact_region_2-src', 'interface')
-solver.tui.define.boundary_conditions.modify_zones.zone_type('symm2-contact_region-contact_region_2-src', 'interface')
 solver.tui.define.boundary_conditions.modify_zones.zone_type('wall', 'wall')
-solver.tui.define.boundary_conditions.modify_zones.zone_type('wall-25', 'wall')
-solver.tui.define.boundary_conditions.modify_zones.zone_type('wall-26', 'wall')
-solver.tui.define.boundary_conditions.modify_zones.zone_type('wall-27', 'wall')
-solver.tui.define.boundary_conditions.modify_zones.zone_type('wall-28', 'wall')
-solver.tui.define.boundary_conditions.modify_zones.zone_type('wall-29', 'wall')
-solver.tui.define.boundary_conditions.modify_zones.zone_type('wall-enclosure_enclosure11', 'wall')
-solver.tui.define.boundary_conditions.modify_zones.zone_type('wall-geom_fin_boi', 'wall')
-solver.tui.define.boundary_conditions.modify_zones.zone_type('wall-geom_nosecone_boi', 'wall')
+
+# velocity inlet
+solver.setup.boundary_conditions.velocity_inlet['inlet'].velocity_spec = 'Components'
+solver.setup.boundary_conditions.velocity_inlet['inlet'].velocity[0] = inlet_x_velocity
+solver.setup.boundary_conditions.velocity_inlet['inlet'].velocity[1] = inlet_y_velocity
+solver.setup.boundary_conditions.velocity_inlet['inlet'].velocity[2] = inlet_z_velocity
 
 # lists all boundry condition zones and their types
 # mainly for debugging purposes
@@ -129,7 +117,7 @@ solver.setup.reference_values.temperature = reference_temperature
 solver.setup.reference_values.velocity = reference_velocity
 solver.setup.reference_values.viscosity = reference_viscosity
 solver.setup.reference_values.yplus = reference_yplus
-
+solver.setup.reference_values.zone = 'enclosure-enclosure'
 # Create drag coeff. monitor
 # >/solve/monitors/force/set-drag-monito
 # monitor name > cd-1
