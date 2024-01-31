@@ -6,15 +6,6 @@ residual_y_velocity,1e-4
 residual_k,1e-4
 residual_omega,1e-4
 number_of_iterations,1000
-reference_area,0.018241
-reference_density,1.225
-reference_enthalpy,0
-reference_length,0.152
-reference_pressure,0
-reference_temperature,288.16
-reference_velocity,274.4
-reference_viscosity,1.7894e-5
-reference_yplus,300
 lift_coef_monitor_zone,enclosure-enclosure:1
 lift_coef_monitor_x_vector,0
 lift_coef_monitor_y_vector,-1
