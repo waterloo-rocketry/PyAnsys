@@ -100,20 +100,19 @@ solver.tui.define.boundary_conditions.list_zones()
 solver.tui.solve.monitors.residual.convergence_criteria(residual_continuity, residual_x_vel, residual_y_vel, residual_k, residual_omega)
 
 # Create lift coeff. monitor
-#
 # >/solve/monitors/force/set-lift-monitor
 # monitor name > cl-1
 # monitor lift coefficient? > yes
-# zone id/name(1) > upper
-# zone id/name(2) > lower
-# zone id/name(3) >
+# zone id/name(1) > lift_coef_monitor_zone
+# zone id/name(2) >
 # print data? > yes
 # write data? > yes
-# lift coeff. data file name? > "cl-1-history"
+# lift coeff. data file name? > lift_file
 # plot data? > no
 # plot per zone? > no
-# x-component of lift vector > -0.1736
-# y-component of lift vector > 0.9848
+# x-component of lift vector > lift_coef_monitor_x_vector
+# y-component of lift vector > lift_coef_monitor_y_vector
+# z-component of lift vector > lift_coef_monitor_z_vector
 solver.tui.solve.monitors.force.set_lift_monitor('cl-1', 'yes', lift_coef_monitor_zone, '()', 'yes', 'yes', lift_file, 'no', 'no', lift_coef_monitor_x_vector, lift_coef_monitor_y_vector, lift_coef_monitor_z_vector)
 
 # set reference values
@@ -127,20 +126,21 @@ solver.setup.reference_values.velocity = reference_velocity
 solver.setup.reference_values.viscosity = reference_viscosity
 solver.setup.reference_values.yplus = reference_yplus
 solver.setup.reference_values.zone = 'enclosure-enclosure'
+
 # Create drag coeff. monitor
-# >/solve/monitors/force/set-drag-monito
+# >/solve/monitors/force/set-drag-monitor
 # monitor name > cd-1
 # monitor drag coefficient > yes
-# zone id/name(1) > lower
-# zone id/name(2) > upper
-# zone id/name(3) >
+# zone id/name(1) > drag_coef_monitor_zone
+# zone id/name(2) >
 # print data? > yes
 # write data? > yes
-# drag coeff. data file name? > "cd-1-history"
+# drag coeff. data file name? > drag_file
 # plot data? > no
 # plpt per zone? > no
-# x-component of drag vector > 0.9848
-# y-component of drag vector > 0.1736
+# x-component of drag vector > drag_coef_monitor_x_vector
+# y-component of drag vector > drag_coef_monitor_y_vector
+# z-component of drag vector > drag_coef_monitor_z_vector
 solver.tui.solve.monitors.force.set_drag_monitor('cd-1', 'yes', drag_coef_monitor_zone, '()', 'yes', 'yes', drag_file, 'no', 'no', drag_coef_monitor_x_vector, drag_coef_monitor_y_vector, drag_coef_monitor_z_vector)
 
 # initialization values in hybrid initialization
