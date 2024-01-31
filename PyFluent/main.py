@@ -5,7 +5,7 @@ from fluentcommands import FluentCommands
 
 # configure values
 # NOTE all variable names MUST match their name in the csv file
-p = Parameters('configurations.csv')
+p = Parameters('configs/configurations.csv')
 
 # names for drag/lift coefficient monitor files
 drag_file = '"cd-1"'
@@ -36,7 +36,7 @@ solver.setup.materials.fluid['air'].viscosity.value = p.air_viscosity
 solver.setup.cell_zone_conditions.fluid['enclosure-enclosure'].material = 'air'
 
 # boundary conditions
-FluentCommands.set_boundary_condition_zone_types(solver, 'boundary_zones.csv')
+FluentCommands.set_boundary_condition_zone_types(solver, 'configs/boundary_zones.csv')
 
 # Specify shear conditions and surface roughness
 solver.setup.boundary_conditions.wall['wall'].shear_bc = 'Specified Shear'  # specify shear condition
@@ -73,7 +73,7 @@ solver.tui.solve.monitors.residual.convergence_criteria(p.residual_continuity, p
 solver.tui.solve.monitors.force.set_lift_monitor('cl-1', 'yes', p.lift_coef_monitor_zone, '()', 'yes', 'yes', lift_file, 'no', 'no', p.lift_coef_monitor_x_vector, p.lift_coef_monitor_y_vector, p.lift_coef_monitor_z_vector)
 
 # set reference values
-FluentCommands.set_reference_values(solver, 'reference_values.csv')
+FluentCommands.set_reference_values(solver, 'configs/reference_values.csv')
 
 # Create drag coeff. monitor
 # >/solve/monitors/force/set-drag-monitor
