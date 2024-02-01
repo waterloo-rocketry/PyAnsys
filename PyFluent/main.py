@@ -101,5 +101,20 @@ solver.solution.initialization.initialize()
 solver.solution.run_calculation.iter_count = p.num_of_iterations
 solver.solution.run_calculation.calculate()
 
+# velocity contours
+solver.results.graphics.contour.create('velocity_contour')
+solver.results.graphics.contour['velocity_contour'].field = 'velocity-magnitude'
+solver.results.graphics.contour['velocity_contour'].surfaces_list = ['outlet']
+solver.results.graphics.views.auto_scale()
+solver.results.graphics.picture.save_picture(file_name='velocity-contour')
+
+# pressure contours
+solver.results.graphics.contour.create('pressure_contour')
+solver.results.graphics.contour['pressure_contour'].field = 'pressure'
+solver.results.graphics.contour['pressure_contour'].surfaces_list = ['wall']
+solver.results.graphics.views.auto_scale()
+solver.results.graphics.picture.save_picture(file_name='pressure-contour')
+
+
 # exit session
 solver.tui.exit()
