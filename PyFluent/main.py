@@ -54,7 +54,7 @@ solver.tui.define.boundary_conditions.list_zones()
 
 # set convergence criteria
 # continuity, x-vel, y-vel, k, omega
-solver.tui.solve.monitors.residual.convergence_criteria(p.residual_continuity, p.residual_x_vel, p.residual_y_vel, p.residual_k, p.residual_omega)
+solver.tui.solve.monitors.residual.convergence_criteria(p.residual_continuity, p.residual_x_velocity, p.residual_y_velocity, p.residual_k, p.residual_omega)
 
 # Create lift coeff. monitor
 # >/solve/monitors/force/set-lift-monitor
@@ -98,7 +98,7 @@ solver.solution.initialization.hybrid_initialize()
 solver.solution.initialization.initialize()
 
 # iterations
-solver.solution.run_calculation.iter_count = p.num_of_iterations
+solver.solution.run_calculation.iter_count = p.number_of_iterations
 solver.solution.run_calculation.calculate()
 
 # velocity contours
@@ -117,4 +117,4 @@ solver.results.graphics.picture.save_picture(file_name='pressure-contour')
 
 
 # exit session
-solver.tui.exit()
+solver.exit()
