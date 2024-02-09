@@ -78,14 +78,14 @@ def run_sim():
     # Normally, you will just calculate this after the iterations have run, but for simplicity it is calculated
     # every iteration alongside drag, in the same folder. Effects on performance are unknown
     solver.solution.report_definitions.expression.create('centre-of-pressure')
-    solver.solution.report_definitions.expression['centre-of-pressure'].define = "AreaInt(y*PressureCoefficient,['wall'])/AreaInt(PressureCoefficient,['wall'])"
+    solver.solution.report_definitions.expression['centre-of-pressure'].define = "7"
     #solver.solution.report_definitions.expression['centre-of-pressure'].define = "AreaInt(y*PressureCoefficient,['enclosure-enclosure11:1'])/AreaInt(PressureCoefficient,['enclosure-enclosure11:1'])"
 
     # Create output file for report monitors
     solver.tui.solve.report_files.add('report-file')
     solver.solution.monitor.report_files['report-file'].report_defs = ['drag-report', 'centre-of-pressure']
     solver.solution.monitor.report_files['report-file'].print = True
-    solver.solution.monitor.report_files['report-file'].file_name = 'myFIle'
+    solver.solution.monitor.report_files['report-file'].file_name = 'report-file'
 
     # initialization values in hybrid initialization
     solver.solution.initialization.hybrid_initialize()
