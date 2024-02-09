@@ -3,11 +3,12 @@ from PyFluent.calculations import *
 import pandas as pd
 
 from PyFluent.main import run_sim
+from file_manager import *
 
 
 # Takes in alt, vel, and AoA data from inputs.csv
 # Using alt, calculates air density and viscosity from imported function
-# Using vel and Aoa, calculates x, y, z vel-vector components from imported function
+# Using vel and AoA, calculates x, y, z vel-vector components from imported function
 #
 # Outputs all this data into variable_configs.csv
 def configure(line):
@@ -32,6 +33,10 @@ def configure(line):
     # dump configurations data frame in variable_configs vile
     cdf.to_csv('PyFluent/configs/variable_configs.csv', sep=',', encoding='utf-8', index=False, header=False)
 
+    # return alt-vel-aoa as a string to be used as folder name
+    # covert to int because filename can't contain "."
+    return f"{int(df.iloc[line]['altitude'])}-{int(df.iloc[line]['angle_of_attack'])}-{int(df.iloc[line]['velocity'])}"
+
 
 # Main function for the entire program
 # Runs a simulation for every inputted case in inputs_csv
@@ -45,11 +50,14 @@ def main():
 
         # For every sim case, run a sim
         for i in range(0, num_of_sims):
-            # set variable configurations
-            configure(i)
+            # set variable configurations and folder name
+            folder_name = configure(i)
 
             # run sim
             run_sim()
+
+            # move files into Logs directory
+            organize_files(folder_name)
 
 
 if __name__ == '__main__':
