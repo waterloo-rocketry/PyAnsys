@@ -3,7 +3,7 @@ residual_x_velocity,1e-4
 residual_y_velocity,1e-4
 residual_k,1e-4
 residual_omega,1e-4
-number_of_iterations,1000
+number_of_iterations,10
 lift_coef_monitor_zone,enclosure-enclosure:1
 lift_coef_monitor_x_vector,0
 lift_coef_monitor_y_vector,-1
