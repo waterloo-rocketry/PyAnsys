@@ -67,8 +67,8 @@ class PyFluentSession:
         # Create centre of pressure monitor
         # Normally, you will just calculate this after the iterations have run, but for simplicity it is calculated
         # every iteration alongside drag, in the same folder. Effects on performance are unknown
-        self.solver.solution.report_definitions.expression.create('centre-of-pressure')
-        self.solver.solution.report_definitions.expression['centre-of-pressure'].define = f"AreaInt(y*PressureCoefficient,['{self.rocket}'])/AreaInt(PressureCoefficient,['{self.rocket}'])"
+        self.solver.solution.report_definitions.single_val_expression.create('centre-of-pressure')
+        self.solver.solution.report_definitions.single_val_expression['centre-of-pressure'].define = f"AreaInt(y*PressureCoefficient,['{self.rocket}'])/AreaInt(PressureCoefficient,['{self.rocket}'])"
 
         # set iterations
         self.solver.solution.run_calculation.iter_count = p.number_of_iterations
