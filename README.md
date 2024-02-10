@@ -8,6 +8,8 @@ Automating Ansys Fluent CFD simulations
 ## Setup
 1. ``git clone https://github.com/waterloo-rocketry/PyAnsys.git``
 2. ``pip install -r requirements.txt``
-3. Place your mesh file in ``Pyfluent/`` folder, must be names ``mesh_flie``
-4. Edit configurations by modifying csv files in ``PyFluent/configs/`` folder
-5. ``python PyFluent/main.py``
+3. Place your mesh file in ``PyFluent/`` folder, must be names ``mesh_file``
+4. Setup configurations by modifying csv files in ``PyFluent/configs/`` folder (no need to edit ``vaeriable_configs.csv`` however)
+5. Add all input cases into ``inputs.csv``
+6. ``python PyFluent/main.py``
+7. Results should appear in ``outputs.csv``, contours and transcripts are available in ``Logs/alt-vel-aoa/``

@@ -41,18 +41,18 @@ def run_sim():
 
     # Update cell zone conditions to use air
     # This should be automatic but just in case
-    #solver.setup.cell_zone_conditions.fluid['enclosure_enclosure:1'].material = 'air'
+    solver.setup.cell_zone_conditions.fluid['enclosure_enclosure11'].material = 'air'
 
     # Setup boundary conditions zone types
     # Print these values to console for debugging purposes
-    #set_boundary_condition_zone_types(solver, 'PyFluent/configs/boundary_zones.csv')
-    #solver.tui.define.boundary_conditions.list_zones()
+    set_boundary_condition_zone_types(solver, 'PyFluent/configs/boundary_zones.csv')
+    solver.tui.define.boundary_conditions.list_zones()
 
     # Change outer wall from no-slip to specified shear
     solver.setup.boundary_conditions.wall['wall'].shear_bc = 'Specified Shear'
 
     # Set surface roughness value for rocket surface
-    #solver.setup.boundary_conditions.wall['enclosure-enclosure:1'].roughness_const.value = p.roughness_constant
+    solver.setup.boundary_conditions.wall['enclosure-enclosure11'].roughness_const.value = p.roughness_constant
 
     # Setup inlet velocity-vector magnitudes
     solver.setup.boundary_conditions.velocity_inlet['inlet'].velocity_spec = 'Components'
@@ -70,16 +70,14 @@ def run_sim():
     # Create drag force monitor
     solver.solution.report_definitions.drag.create('drag-report')  # New report definition
     solver.solution.report_definitions.drag['drag-report'].force_vector = [p.drag_coef_monitor_x_vector, p.drag_coef_monitor_y_vector, p.drag_coef_monitor_z_vector]  # Set x, y, z force vectors
-    #solver.solution.report_definitions.drag['drag-report'].thread_names = p.drag_coef_monitor_zone  # select zone
-    solver.solution.report_definitions.drag['drag-report'].thread_names = 'wall'
+    solver.solution.report_definitions.drag['drag-report'].thread_names = p.drag_coef_monitor_zone  # select zone
     solver.solution.report_definitions.drag['drag-report'].scaled = False  # set to drag force from drag coef.
 
     # Create centre of pressure monitor
     # Normally, you will just calculate this after the iterations have run, but for simplicity it is calculated
     # every iteration alongside drag, in the same folder. Effects on performance are unknown
     solver.solution.report_definitions.expression.create('centre-of-pressure')
-    solver.solution.report_definitions.expression['centre-of-pressure'].define = "7"
-    #solver.solution.report_definitions.expression['centre-of-pressure'].define = "AreaInt(y*PressureCoefficient,['enclosure-enclosure11:1'])/AreaInt(PressureCoefficient,['enclosure-enclosure11:1'])"
+    solver.solution.report_definitions.expression['centre-of-pressure'].define = "AreaInt(y*PressureCoefficient,['enclosure-enclosure11:1'])/AreaInt(PressureCoefficient,['enclosure-enclosure11:1'])"
 
     # Create output file for report monitors
     solver.tui.solve.report_files.add('report-file')
@@ -100,14 +98,14 @@ def run_sim():
     # velocity contours
     solver.results.graphics.contour.create('velocity_contour')
     solver.results.graphics.contour['velocity_contour'].field = 'velocity-magnitude'
-    solver.results.graphics.contour['velocity_contour'].surfaces_list = ['outlet']
+    solver.results.graphics.contour['velocity_contour'].surfaces_list = ['interior--enclosure-enclosure']
     solver.results.graphics.views.auto_scale()
     solver.results.graphics.picture.save_picture(file_name='velocity-contour')
 
     # pressure contours
     solver.results.graphics.contour.create('pressure_contour')
     solver.results.graphics.contour['pressure_contour'].field = 'pressure'
-    solver.results.graphics.contour['pressure_contour'].surfaces_list = ['wall']
+    solver.results.graphics.contour['pressure_contour'].surfaces_list = ['enclosure_enclosure11']
     solver.results.graphics.views.auto_scale()
     solver.results.graphics.picture.save_picture(file_name='pressure-contour')
 
