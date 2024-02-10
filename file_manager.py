@@ -1,5 +1,6 @@
 import os
 from time import sleep
+from datetime import datetime
 
 """
 
@@ -12,7 +13,11 @@ static_files = ['.git', 'file_manager.py', 'inputs.csv', 'Logs', 'main.py', 'PyF
                 'requirements.txt', '__pycache__', 'process.py', 'outputs.csv']
 
 
-def organize_files(folder_name):
+def organize_files():
+
+    # folder name is timestamp it is created
+    folder_name = str(datetime.now())[:-7].replace(':', '-')
+
     # create folder inside Logs
     try:
         os.mkdir(f'./Logs/{folder_name}')

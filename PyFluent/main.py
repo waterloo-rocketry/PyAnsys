@@ -7,111 +7,114 @@ from PyFluent.fluentcommands import *
 # Runs a simulation on an instance of Ansys Fluent
 # It is highly recommended that you are familiar with Fluent CFD simulations
 # before attempting to make any modifications to this code
-def run_sim():
+class PyFluentSession:
+    def __init__(self):
+        # Import all configurations from csv files in configs folder
+        p = Parameters('PyFluent/configs/static_configs.csv')
 
-    # Import all configurations from csv files in configs folder
-    p = Parameters('PyFluent/configs/static_configs.csv')
-    c = Parameters('PyFluent/configs/variable_configs.csv')
+        # variable for interior and exterior walls and interior
+        self.rocket = 'enclosure-enclosure:1'
+        self.wall = 'enclosure-enclosure:85'
+        self.interior = 'interior--enclosure-enclosure'
 
-    # Output file name for drag force monitor
-    drag_file = '"cd-1"'
+        # Launch session of fluent
+        # Leave product version blank if unsure
+        # For gpu solving, set gpu=True
+        self.solver = pyfluent.launch_fluent(show_gui=False, precision='single', version='3d', mode='solver', product_version='23.2.0', gpu=False)
 
-    # Launch session of fluent
-    # Leave product verion blank if unsure
-    # For gpu solving, set gpu=True
-    solver = pyfluent.launch_fluent(show_gui=False, precision='single', version='3d', mode='solver', product_version='23.2.0', gpu=False)
+        # Read mesh file
+        # Sometimes does not have .h5 extension, mainly when using student version
+        try:
+            self.solver.file.read_mesh(file_name='PyFluent/mesh_file.msh.h5', file_type='mesh')
+        except RuntimeError:
+            self.solver.file.read_mesh(file_name='PyFluent/mesh_file.msh', file_type='mesh')
 
-    # Read mesh file
-    # Sometimes does not have .h5 extension, mainly when using student version
-    try:
-        solver.file.read_mesh(file_name='PyFluent/mesh_file.msh.h5', file_type='mesh')
-    except RuntimeError:
-        solver.file.read_mesh(file_name='PyFluent/mesh_file.msh', file_type='mesh')
+        # Check mesh
+        self.solver.mesh.check()
 
-    # Check mesh
-    solver.mesh.check()
+        # Change viscous model to k-omega, sst
+        self.solver.setup.models.viscous.model = 'k-omega'
+        self.solver.setup.models.viscous.k_omega_model = 'sst'
 
-    # Change viscous model to k-omega, sst
-    solver.setup.models.viscous.model = 'k-omega'
-    solver.setup.models.viscous.k_omega_model = 'sst'
+        # Update cell zone conditions to use air
+        # This should be automatic but just in case
+        self.solver.setup.cell_zone_conditions.fluid['enclosure-enclosure'].material = 'air'
 
-    # Set density and viscosity of air
-    solver.setup.materials.fluid['air'].density.value = c.air_density
-    solver.setup.materials.fluid['air'].viscosity.value = c.air_viscosity
+        # Setup boundary conditions zone types
+        # Print these values to console for debugging purposes
+        set_boundary_condition_zone_types(self.solver, 'PyFluent/configs/boundary_zones.csv')
+        self.solver.tui.define.boundary_conditions.list_zones()
 
-    # Update cell zone conditions to use air
-    # This should be automatic but just in case
-    solver.setup.cell_zone_conditions.fluid['enclosure_enclosure11'].material = 'air'
+        # Change outer wall from no-slip to specified shear
+        self.solver.setup.boundary_conditions.wall[self.wall].shear_bc = 'Specified Shear'
 
-    # Setup boundary conditions zone types
-    # Print these values to console for debugging purposes
-    set_boundary_condition_zone_types(solver, 'PyFluent/configs/boundary_zones.csv')
-    solver.tui.define.boundary_conditions.list_zones()
+        # Set surface roughness value for rocket surface
+        self.solver.setup.boundary_conditions.wall[self.rocket].roughness_const.value = p.roughness_constant
 
-    # Change outer wall from no-slip to specified shear
-    solver.setup.boundary_conditions.wall['wall'].shear_bc = 'Specified Shear'
+        # Setup convergence values
+        # continuity, x-vel, y-vel, k, omega
+        self.solver.tui.solve.monitors.residual.convergence_criteria(p.residual_continuity, p.residual_x_velocity, p.residual_y_velocity, p.residual_k, p.residual_omega)
 
-    # Set surface roughness value for rocket surface
-    solver.setup.boundary_conditions.wall['enclosure-enclosure11'].roughness_const.value = p.roughness_constant
+        # set reference values
+        set_reference_values(self.solver, 'PyFluent/configs/reference_values.csv')
 
-    # Setup inlet velocity-vector magnitudes
-    solver.setup.boundary_conditions.velocity_inlet['inlet'].velocity_spec = 'Components'
-    solver.setup.boundary_conditions.velocity_inlet['inlet'].velocity[0] = c.inlet_x_velocity
-    solver.setup.boundary_conditions.velocity_inlet['inlet'].velocity[1] = c.inlet_y_velocity
-    solver.setup.boundary_conditions.velocity_inlet['inlet'].velocity[2] = c.inlet_z_velocity
+        # Create drag force monitor
+        self.solver.solution.report_definitions.drag.create('drag-report')  # New report definition
+        self.solver.solution.report_definitions.drag['drag-report'].force_vector = [p.drag_coef_monitor_x_vector, p.drag_coef_monitor_y_vector, p.drag_coef_monitor_z_vector]  # Set x, y, z force vectors
+        self.solver.solution.report_definitions.drag['drag-report'].thread_names = p.drag_coef_monitor_zone  # select zone
+        self.solver.solution.report_definitions.drag['drag-report'].scaled = False  # set to drag force from drag coef.
 
-    # Setup convergence values
-    # continuity, x-vel, y-vel, k, omega
-    solver.tui.solve.monitors.residual.convergence_criteria(p.residual_continuity, p.residual_x_velocity, p.residual_y_velocity, p.residual_k, p.residual_omega)
+        # Create centre of pressure monitor
+        # Normally, you will just calculate this after the iterations have run, but for simplicity it is calculated
+        # every iteration alongside drag, in the same folder. Effects on performance are unknown
+        self.solver.solution.report_definitions.expression.create('centre-of-pressure')
+        self.solver.solution.report_definitions.expression['centre-of-pressure'].define = f"AreaInt(y*PressureCoefficient,['{self.rocket}'])/AreaInt(PressureCoefficient,['{self.rocket}'])"
 
-    # set reference values
-    set_reference_values(solver, 'PyFluent/configs/reference_values.csv')
+        # set iterations
+        self.solver.solution.run_calculation.iter_count = p.number_of_iterations
 
-    # Create drag force monitor
-    solver.solution.report_definitions.drag.create('drag-report')  # New report definition
-    solver.solution.report_definitions.drag['drag-report'].force_vector = [p.drag_coef_monitor_x_vector, p.drag_coef_monitor_y_vector, p.drag_coef_monitor_z_vector]  # Set x, y, z force vectors
-    solver.solution.report_definitions.drag['drag-report'].thread_names = p.drag_coef_monitor_zone  # select zone
-    solver.solution.report_definitions.drag['drag-report'].scaled = False  # set to drag force from drag coef.
+    def __del__(self):
+        # exit session
+        self.solver.exit()
 
-    # Create centre of pressure monitor
-    # Normally, you will just calculate this after the iterations have run, but for simplicity it is calculated
-    # every iteration alongside drag, in the same folder. Effects on performance are unknown
-    solver.solution.report_definitions.expression.create('centre-of-pressure')
-    solver.solution.report_definitions.expression['centre-of-pressure'].define = "AreaInt(y*PressureCoefficient,['enclosure-enclosure11:1'])/AreaInt(PressureCoefficient,['enclosure-enclosure11:1'])"
+    def run_sims(self, report_file):
+        p = Parameters('PyFluent/configs/variable_configs.csv')
 
-    # Create output file for report monitors
-    solver.tui.solve.report_files.add('report-file')
-    solver.solution.monitor.report_files['report-file'].report_defs = ['drag-report', 'centre-of-pressure']
-    solver.solution.monitor.report_files['report-file'].print = True
-    solver.solution.monitor.report_files['report-file'].file_name = 'report-file'
+        # Set density and viscosity of air
+        self.solver.setup.materials.fluid['air'].density.value = p.air_density
+        self.solver.setup.materials.fluid['air'].viscosity.value = p.air_viscosity
 
-    # initialization values in hybrid initialization
-    solver.solution.initialization.hybrid_initialize()
+        # Setup inlet velocity-vector magnitudes
+        self.solver.setup.boundary_conditions.velocity_inlet['inlet'].velocity_spec = 'Components'
+        self.solver.setup.boundary_conditions.velocity_inlet['inlet'].velocity[0] = p.inlet_x_velocity
+        self.solver.setup.boundary_conditions.velocity_inlet['inlet'].velocity[1] = p.inlet_y_velocity
+        self.solver.setup.boundary_conditions.velocity_inlet['inlet'].velocity[2] = p.inlet_z_velocity
 
-    # initialize
-    solver.solution.initialization.initialize()
+        # Create output file for report monitors
+        self.solver.tui.solve.report_files.add('report-file')
+        self.solver.solution.monitor.report_files['report-file'].report_defs = ['drag-report', 'centre-of-pressure']
+        self.solver.solution.monitor.report_files['report-file'].print = True
+        self.solver.solution.monitor.report_files['report-file'].file_name = f'report-{report_file}'
 
-    # iterations
-    solver.solution.run_calculation.iter_count = p.number_of_iterations
-    solver.solution.run_calculation.calculate()
+        # initialization values in hybrid initialization
+        self.solver.solution.initialization.hybrid_initialize()
 
-    # velocity contours
-    solver.results.graphics.contour.create('velocity_contour')
-    solver.results.graphics.contour['velocity_contour'].field = 'velocity-magnitude'
-    solver.results.graphics.contour['velocity_contour'].surfaces_list = ['interior--enclosure-enclosure']
-    solver.results.graphics.views.auto_scale()
-    solver.results.graphics.picture.save_picture(file_name='velocity-contour')
+        # initialize
+        self.solver.solution.initialization.initialize()
 
-    # pressure contours
-    solver.results.graphics.contour.create('pressure_contour')
-    solver.results.graphics.contour['pressure_contour'].field = 'pressure'
-    solver.results.graphics.contour['pressure_contour'].surfaces_list = ['enclosure_enclosure11']
-    solver.results.graphics.views.auto_scale()
-    solver.results.graphics.picture.save_picture(file_name='pressure-contour')
+        # solve
+        self.solver.solution.run_calculation.calculate()
 
-    # exit session
-    solver.exit()
+        # velocity contours
+        self.solver.results.graphics.contour.create('velocity_contour')
+        self.solver.results.graphics.contour['velocity_contour'].field = 'velocity-magnitude'
+        self.solver.results.graphics.contour['velocity_contour'].surfaces_list = [self.interior]
+        self.solver.results.graphics.views.auto_scale()
+        self.solver.results.graphics.picture.save_picture(file_name='velocity-contour')
 
-
-if __name__ == '__main__':
-    run_sim()
+        # pressure contours
+        self.solver.results.graphics.contour.create('pressure_contour')
+        self.solver.results.graphics.contour['pressure_contour'].field = 'pressure'
+        self.solver.results.graphics.contour['pressure_contour'].surfaces_list = ['enclosure-enclosure']
+        self.solver.results.graphics.views.auto_scale()
+        self.solver.results.graphics.picture.save_picture(file_name='pressure-contour')
