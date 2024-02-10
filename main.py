@@ -1,6 +1,6 @@
-from PyFluent.calculations import *
+from PyFluent.main import PyFluentSession
 
-from PyFluent.main import run_sim
+from PyFluent.calculations import *
 from file_manager import *
 from process import *
 
@@ -32,7 +32,7 @@ def configure(line):
     # dump configurations data frame in variable_configs vile
     cdf.to_csv('PyFluent/configs/variable_configs.csv', sep=',', encoding='utf-8', index=False, header=False)
 
-    # return alt-vel-aoa as a string to be used as folder name
+    # return alt-vel-aoa as a string to be used as report file name
     # covert to int because filename can't contain "."
     return f"{int(df.iloc[line]['altitude'])}-{int(df.iloc[line]['angle_of_attack'])}-{int(df.iloc[line]['velocity'])}"
 
@@ -48,19 +48,22 @@ def main():
         # subtract one line for the header
         num_of_sims = len(in_file.readlines()) - 1
 
+        # create session
+        session = PyFluentSession()
+
         # For every sim case, run a sim
         for i in range(0, num_of_sims):
             # set variable configurations and folder name
-            folder_name = configure(i)
+            file_name = configure(i)
 
             # run sim
-            run_sim()
-
-            # move files into Logs directory
-            organize_files(folder_name)
+            session.run_sims(file_name)
 
             # read report file and upload to outputs.csv
-            retrieve_date(f'Logs/{folder_name}/report-file.out')
+            retrieve_date(f'report-{file_name}')
+
+        # move files into Logs directory
+        organize_files()
 
 
 if __name__ == '__main__':
