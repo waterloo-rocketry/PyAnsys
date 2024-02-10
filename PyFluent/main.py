@@ -108,13 +108,13 @@ class PyFluentSession:
         # velocity contours
         self.solver.results.graphics.contour.create('velocity_contour')
         self.solver.results.graphics.contour['velocity_contour'].field = 'velocity-magnitude'
-        self.solver.results.graphics.contour['velocity_contour'].surfaces_list = [self.interior]
+        self.solver.results.graphics.contour['velocity_contour'].surfaces_list = ['enclosure-enclosure']
         self.solver.results.graphics.views.auto_scale()
-        self.solver.results.graphics.picture.save_picture(file_name='velocity-contour')
+        self.solver.results.graphics.picture.save_picture(file_name=f'velocity-contour-{report_file}')
 
         # pressure contours
         self.solver.results.graphics.contour.create('pressure_contour')
         self.solver.results.graphics.contour['pressure_contour'].field = 'pressure'
         self.solver.results.graphics.contour['pressure_contour'].surfaces_list = ['enclosure-enclosure']
         self.solver.results.graphics.views.auto_scale()
-        self.solver.results.graphics.picture.save_picture(file_name='pressure-contour')
+        self.solver.results.graphics.picture.save_picture(file_name=f'pressure-contour-{report_file}')
