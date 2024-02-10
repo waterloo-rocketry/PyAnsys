@@ -9,7 +9,7 @@ Moves all files created by Fluent session into folder in Logs directory
 
 # List of all files and folders that are off limits
 static_files = ['.git', 'file_manager.py', 'inputs.csv', 'Logs', 'main.py', 'PyFluent', 'README.md',
-                'requirements.txt', '__pycache__']
+                'requirements.txt', '__pycache__', 'process.py', 'outputs.csv']
 
 
 def organize_files(folder_name):
@@ -18,7 +18,8 @@ def organize_files(folder_name):
         os.mkdir(f'./Logs/{folder_name}')
     except FileExistsError:
         # if directory already exists, overwrite
-        pass
+        for file in os.listdir(f'./Logs/{folder_name}'):
+            os.remove(f'./Logs/{folder_name}/{file}')
 
     # move all files not in static_files into the new directory
     for file in os.listdir():
@@ -27,5 +28,5 @@ def organize_files(folder_name):
                 os.rename(f'./{file}', f'./Logs/{folder_name}/{file}')
             except PermissionError:
                 # incase Fluent is still shutting down and a file is being used
-                sleep(5)
+                sleep(10)
                 os.rename(f'./{file}', f'./Logs/{folder_name}/{file}')

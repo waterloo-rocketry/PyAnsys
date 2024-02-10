@@ -1,9 +1,8 @@
 from PyFluent.calculations import *
 
-import pandas as pd
-
 from PyFluent.main import run_sim
 from file_manager import *
+from process import *
 
 
 # Takes in alt, vel, and AoA data from inputs.csv
@@ -40,6 +39,7 @@ def configure(line):
 
 # Main function for the entire program
 # Runs a simulation for every inputted case in inputs_csv
+# Outputs drag-force and centre-of-pressure to outputs.csv
 def main():
 
     # Determine how many simulations to run by checking how many lines are in inputs file
@@ -58,6 +58,9 @@ def main():
 
             # move files into Logs directory
             organize_files(folder_name)
+
+            # read report file and upload to outputs.csv
+            retrieve_date(f'Logs/{folder_name}/report-file.out')
 
 
 if __name__ == '__main__':
