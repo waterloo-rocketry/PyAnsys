@@ -1,5 +1,5 @@
-wall,wall
-outlet,pressure-outlet
-interior--enclosure-enclosure,interior
-inlet,velocity-inlet
-enclosure-enclosure:1,wall
+wall,enclosure-enclosure:85
+pressure-outlet,outlet
+interior,interior--enclosure-enclosure
+velocity-inlet,inlet
+wall,enclosure-enclosure:1

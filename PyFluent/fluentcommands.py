@@ -15,7 +15,7 @@ def set_boundary_condition_zone_types(solver, zone_file):
         infile = csv.reader(csv_file, delimiter=',')
 
         for row in infile:
-            solver.tui.define.boundary_conditions.modify_zones.zone_type(row[0], row[1])
+            solver.tui.define.boundary_conditions.modify_zones.zone_type(row[1], row[0])
 
 
 # Sets the reference values for Fluent based off of values in

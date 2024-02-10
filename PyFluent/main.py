@@ -12,6 +12,11 @@ class PyFluentSession:
         # Import all configurations from csv files in configs folder
         p = Parameters('PyFluent/configs/static_configs.csv')
 
+        # variable for interior and exterior walls and interior
+        self.rocket = 'enclosure-enclosure:1'
+        self.wall = 'enclosure-enclosure:85'
+        self.interior = 'interior--enclosure-enclosure'
+
         # Launch session of fluent
         # Leave product version blank if unsure
         # For gpu solving, set gpu=True
@@ -33,7 +38,7 @@ class PyFluentSession:
 
         # Update cell zone conditions to use air
         # This should be automatic but just in case
-        self.solver.setup.cell_zone_conditions.fluid['enclosure_enclosure11'].material = 'air'
+        self.solver.setup.cell_zone_conditions.fluid['enclosure-enclosure'].material = 'air'
 
         # Setup boundary conditions zone types
         # Print these values to console for debugging purposes
@@ -41,10 +46,10 @@ class PyFluentSession:
         self.solver.tui.define.boundary_conditions.list_zones()
 
         # Change outer wall from no-slip to specified shear
-        self.solver.setup.boundary_conditions.wall['wall'].shear_bc = 'Specified Shear'
+        self.solver.setup.boundary_conditions.wall[self.wall].shear_bc = 'Specified Shear'
 
         # Set surface roughness value for rocket surface
-        self.solver.setup.boundary_conditions.wall['enclosure-enclosure11'].roughness_const.value = p.roughness_constant
+        self.solver.setup.boundary_conditions.wall[self.rocket].roughness_const.value = p.roughness_constant
 
         # Setup convergence values
         # continuity, x-vel, y-vel, k, omega
@@ -63,7 +68,7 @@ class PyFluentSession:
         # Normally, you will just calculate this after the iterations have run, but for simplicity it is calculated
         # every iteration alongside drag, in the same folder. Effects on performance are unknown
         self.solver.solution.report_definitions.expression.create('centre-of-pressure')
-        self.solver.solution.report_definitions.expression['centre-of-pressure'].define = "AreaInt(y*PressureCoefficient,['enclosure-enclosure11:1'])/AreaInt(PressureCoefficient,['enclosure-enclosure11:1'])"
+        self.solver.solution.report_definitions.expression['centre-of-pressure'].define = f"AreaInt(y*PressureCoefficient,['{self.rocket}'])/AreaInt(PressureCoefficient,['{self.rocket}'])"
 
         # set iterations
         self.solver.solution.run_calculation.iter_count = p.number_of_iterations
@@ -103,13 +108,13 @@ class PyFluentSession:
         # velocity contours
         self.solver.results.graphics.contour.create('velocity_contour')
         self.solver.results.graphics.contour['velocity_contour'].field = 'velocity-magnitude'
-        self.solver.results.graphics.contour['velocity_contour'].surfaces_list = ['interior--enclosure-enclosure']
+        self.solver.results.graphics.contour['velocity_contour'].surfaces_list = [self.interior]
         self.solver.results.graphics.views.auto_scale()
         self.solver.results.graphics.picture.save_picture(file_name='velocity-contour')
 
         # pressure contours
         self.solver.results.graphics.contour.create('pressure_contour')
         self.solver.results.graphics.contour['pressure_contour'].field = 'pressure'
-        self.solver.results.graphics.contour['pressure_contour'].surfaces_list = ['enclosure_enclosure11']
+        self.solver.results.graphics.contour['pressure_contour'].surfaces_list = ['enclosure-enclosure']
         self.solver.results.graphics.views.auto_scale()
         self.solver.results.graphics.picture.save_picture(file_name='pressure-contour')
