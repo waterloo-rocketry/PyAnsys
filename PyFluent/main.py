@@ -94,6 +94,7 @@ class PyFluentSession:
         self.solver.setup.materials.fluid['air'].density.value = p.air_density
         self.solver.setup.materials.fluid['air'].viscosity.value = p.air_viscosity
 
+
         # Setup inlet velocity-vector magnitudes
         self.solver.setup.boundary_conditions.velocity_inlet['inlet'].velocity_spec = 'Components'
         self.solver.setup.boundary_conditions.velocity_inlet['inlet'].velocity[0] = p.inlet_x_velocity
