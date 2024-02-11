@@ -62,6 +62,9 @@ def main():
             # read report file and upload to outputs.csv
             retrieve_date(f'report-{file_name}.out')
 
+        # exit Fluent
+        session.exit()
+
         # move files into Logs directory
         organize_files()
 

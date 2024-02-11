@@ -32,6 +32,9 @@ def organize_files():
             try:
                 os.rename(f'./{file}', f'./Logs/{folder_name}/{file}')
             except PermissionError:
-                # incase Fluent is still shutting down and a file is being used
-                sleep(10)
-                os.rename(f'./{file}', f'./Logs/{folder_name}/{file}')
+                try:
+                    # incase Fluent is still shutting down and a file is being used
+                    sleep(10)
+                    os.rename(f'./{file}', f'./Logs/{folder_name}/{file}')
+                except PermissionError as e:
+                    print(e)

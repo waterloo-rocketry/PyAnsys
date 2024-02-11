@@ -73,7 +73,17 @@ class PyFluentSession:
         # set iterations
         self.solver.solution.run_calculation.iter_count = p.number_of_iterations
 
-    def __del__(self):
+        # create velocity contours
+        self.solver.results.graphics.contour.create('velocity_contour')
+        self.solver.results.graphics.contour['velocity_contour'].field = 'velocity-magnitude'
+        self.solver.results.graphics.contour['velocity_contour'].surfaces_list = [self.rocket]
+
+        # create pressure contours
+        self.solver.results.graphics.contour.create('pressure_contour')
+        self.solver.results.graphics.contour['pressure_contour'].field = 'pressure'
+        self.solver.results.graphics.contour['pressure_contour'].surfaces_list = [self.rocket]
+
+    def exit(self):
         # exit session
         self.solver.exit()
 
@@ -105,16 +115,12 @@ class PyFluentSession:
         # solve
         self.solver.solution.run_calculation.calculate()
 
-        # velocity contours
-        self.solver.results.graphics.contour.create('velocity_contour')
-        self.solver.results.graphics.contour['velocity_contour'].field = 'velocity-magnitude'
-        self.solver.results.graphics.contour['velocity_contour'].surfaces_list = [self.rocket]
+        # save velocity contour
+        self.solver.results.graphics.contour['velocity_contour'].display()
         self.solver.results.graphics.views.auto_scale()
         self.solver.results.graphics.picture.save_picture(file_name=f'velocity-contour-{report_file}')
 
-        # pressure contours
-        self.solver.results.graphics.contour.create('pressure_contour')
-        self.solver.results.graphics.contour['pressure_contour'].field = 'pressure'
-        self.solver.results.graphics.contour['pressure_contour'].surfaces_list = [self.rocket]
+        # save pressure contour
+        self.solver.results.graphics.contour['pressure_contour'].display()
         self.solver.results.graphics.views.auto_scale()
         self.solver.results.graphics.picture.save_picture(file_name=f'pressure-contour-{report_file}')
