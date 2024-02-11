@@ -4,8 +4,5 @@ residual_y_velocity,1e-4
 residual_k,1e-4
 residual_omega,1e-4
 number_of_iterations,10
-drag_coef_monitor_zone,'enclosure-enclosure:1'
-drag_coef_monitor_x_vector,0
-drag_coef_monitor_y_vector,-1
-drag_coef_monitor_z_vector,0
+drag_force_monitor_zone,'enclosure-enclosure:1'
 roughness_constant,5e-6

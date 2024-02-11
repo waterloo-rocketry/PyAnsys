@@ -59,14 +59,14 @@ class PyFluentSession:
         # set reference values
         set_reference_values(self.solver, 'PyFluent/configs/reference_values.csv')
         # manually set variable reference values
-        solver.setup.reference_values.velocity = c.air_velocity
-        solver.setup.reference_values.viscosity = c.air_viscosity
-        solver.setup.reference_values.density = c.air_density
+        self.solver.setup.reference_values.velocity = self.c.air_velocity
+        self.solver.setup.reference_values.viscosity = self.c.air_viscosity
+        self.solver.setup.reference_values.density = self.c.air_density
 
         # Create drag force monitor
         self.solver.solution.report_definitions.drag.create('drag-report')  # New report definition
-        self.solver.solution.report_definitions.drag['drag-report'].force_vector = [p.drag_coef_monitor_x_vector, p.drag_coef_monitor_y_vector, p.drag_coef_monitor_z_vector]  # Set x, y, z force vectors
-        self.solver.solution.report_definitions.drag['drag-report'].thread_names = p.drag_coef_monitor_zone  # select zone
+        self.solver.solution.report_definitions.drag['drag-report'].force_vector = [self.c.drag_force_monitor_x_vector, self.c.drag_force_monitor_y_vector, self.c.drag_force_monitor_z_vector]  # Set x, y, z force vectors
+        self.solver.solution.report_definitions.drag['drag-report'].thread_names = p.drag_force_monitor_zone  # select zone
         self.solver.solution.report_definitions.drag['drag-report'].scaled = False  # set to drag force from drag coef.
 
         # Create centre of pressure monitor

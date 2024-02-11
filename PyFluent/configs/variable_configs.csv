@@ -4,3 +4,6 @@ inlet_x_velocity,-27.893451546568876
 inlet_y_velocity,2.4403607969344296
 inlet_z_velocity,0.0
 air_velocity,0
+drag_force_monitor_x_vector,0
+drag_force_monitor_y_vector,-1
+drag_force_monitor_z_vector,0
