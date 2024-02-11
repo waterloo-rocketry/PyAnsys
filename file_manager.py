@@ -10,7 +10,7 @@ Moves all files created by Fluent session into folder in Logs directory
 
 # List of all files and folders that are off limits
 static_files = ['.git', 'file_manager.py', 'inputs.csv', 'Logs', 'main.py', 'PyFluent', 'README.md',
-                'requirements.txt', '__pycache__', 'process.py', 'outputs.csv', '.venv', 'idea']
+                'requirements.txt', '__pycache__', 'process.py', 'outputs.csv', 'venv', '.idea']
 
 
 def organize_files():
