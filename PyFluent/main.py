@@ -20,7 +20,7 @@ class PyFluentSession:
         # Launch session of fluent
         # Leave product version blank if unsure
         # For gpu solving, set gpu=True
-        self.solver = pyfluent.launch_fluent(show_gui=False, precision='single', version='3d', mode='solver', product_version='23.2.0', gpu=False)
+        self.solver = pyfluent.launch_fluent(show_gui=False, precision='single', version='3d', mode='solver', product_version='23.2.0', gpu=False, processor_count=30)
 
         # Read mesh file
         # Sometimes does not have .h5 extension, mainly when using student version
