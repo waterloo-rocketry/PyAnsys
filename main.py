@@ -20,9 +20,6 @@ def configure(line):
     density_viscosity = calculate_atmospheric_properties(df.iloc[line]['altitude'])
     velocity = velocity_vectors_from_angle_of_attack(df.iloc[line]['angle_of_attack'], df.iloc[line]['velocity'])
 
-    # Update the reference values file
-    update_reference("configs/reference_values.csv", density_viscosity, df.iloc[line]['velocity'])
-
     # create new data frame for configurations file by reading variable_configs file
     cdf = pd.read_csv('PyFluent/configs/variable_configs.csv', header=None)
 
@@ -32,6 +29,7 @@ def configure(line):
     cdf.iloc[[2], [1]] = velocity[0]  # x velocity
     cdf.iloc[[3], [1]] = velocity[1]  # y velocity
     cdf.iloc[[4], [1]] = 0  # z velocity
+    cdf.iloc[[5], [1]] = df.iloc[line]['velocity']
 
     # dump configurations data frame in variable_configs vile
     cdf.to_csv('PyFluent/configs/variable_configs.csv', sep=',', encoding='utf-8', index=False, header=False)

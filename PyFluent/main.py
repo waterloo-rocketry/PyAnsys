@@ -11,6 +11,7 @@ class PyFluentSession:
     def __init__(self):
         # Import all configurations from csv files in configs folder
         p = Parameters('PyFluent/configs/static_configs.csv')
+        self.c = Parameters('PyFluent/configs/variable_configs.csv')
 
         # variable for interior and exterior walls and interior
         self.rocket = 'enclosure-enclosure:1'
@@ -57,6 +58,10 @@ class PyFluentSession:
 
         # set reference values
         set_reference_values(self.solver, 'PyFluent/configs/reference_values.csv')
+        # manually set variable reference values
+        solver.setup.reference_values.velocity = c.air_velocity
+        solver.setup.reference_values.viscosity = c.air_viscosity
+        solver.setup.reference_values.density = c.air_density
 
         # Create drag force monitor
         self.solver.solution.report_definitions.drag.create('drag-report')  # New report definition
@@ -88,18 +93,17 @@ class PyFluentSession:
         self.solver.exit()
 
     def run_sims(self, report_file):
-        p = Parameters('PyFluent/configs/variable_configs.csv')
 
         # Set density and viscosity of air
-        self.solver.setup.materials.fluid['air'].density.value = p.air_density
-        self.solver.setup.materials.fluid['air'].viscosity.value = p.air_viscosity
+        self.solver.setup.materials.fluid['air'].density.value = self.c.air_density
+        self.solver.setup.materials.fluid['air'].viscosity.value = self.c.air_viscosity
 
 
         # Setup inlet velocity-vector magnitudes
         self.solver.setup.boundary_conditions.velocity_inlet['inlet'].velocity_spec = 'Components'
-        self.solver.setup.boundary_conditions.velocity_inlet['inlet'].velocity[0] = p.inlet_x_velocity
-        self.solver.setup.boundary_conditions.velocity_inlet['inlet'].velocity[1] = p.inlet_y_velocity
-        self.solver.setup.boundary_conditions.velocity_inlet['inlet'].velocity[2] = p.inlet_z_velocity
+        self.solver.setup.boundary_conditions.velocity_inlet['inlet'].velocity[0] = self.c.inlet_x_velocity
+        self.solver.setup.boundary_conditions.velocity_inlet['inlet'].velocity[1] = self.c.inlet_y_velocity
+        self.solver.setup.boundary_conditions.velocity_inlet['inlet'].velocity[2] = self.c.inlet_z_velocity
 
         # Create output file for report monitors
         self.solver.tui.solve.report_files.add('report-file')
