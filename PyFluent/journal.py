@@ -22,6 +22,8 @@ To start the journal:
 That's it, you do not need to edit this file or do anything else, just use the Fluent console to do whatever
 your trying to achieve, and it will automatically be turned into code inside this file for you
 
+If you end up using the journal, please refrain from committing changes to this file in git to not lose this message
+
 """
 
 try:
