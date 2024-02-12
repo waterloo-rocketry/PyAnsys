@@ -15,7 +15,7 @@ class PyFluentSession:
 
         # variable for interior and exterior walls and interior
         self.rocket = 'enclosure-enclosure:1'
-        self.wall = 'enclosure-enclosure:85'
+        self.wall = 'enclosure-enclosure:91'
         self.interior = 'interior--enclosure-enclosure'
 
         # Launch session of fluent
@@ -73,7 +73,7 @@ class PyFluentSession:
         # Normally, you will just calculate this after the iterations have run, but for simplicity it is calculated
         # every iteration alongside drag, in the same folder. Effects on performance are unknown
         self.solver.solution.report_definitions.single_val_expression.create('centre-of-pressure')
-        self.solver.solution.report_definitions.single_val_expression['centre-of-pressure'].define = f"AreaInt(y*PressureCoefficient,['{self.rocket}'])/AreaInt(PressureCoefficient,['{self.rocket}'])"
+        self.solver.solution.report_definitions.single_val_expression['centre-of-pressure'].define = f"AreaInt(y*PressureCoefficient,['{self.wall}'])/AreaInt(PressureCoefficient,['{self.wall}'])"
 
         # set iterations
         self.solver.solution.run_calculation.iter_count = p.number_of_iterations
@@ -81,12 +81,12 @@ class PyFluentSession:
         # create velocity contours
         self.solver.results.graphics.contour.create('velocity_contour')
         self.solver.results.graphics.contour['velocity_contour'].field = 'velocity-magnitude'
-        self.solver.results.graphics.contour['velocity_contour'].surfaces_list = [self.rocket]
+        self.solver.results.graphics.contour['velocity_contour'].surfaces_list = [self.wall]
 
         # create pressure contours
         self.solver.results.graphics.contour.create('pressure_contour')
         self.solver.results.graphics.contour['pressure_contour'].field = 'pressure'
-        self.solver.results.graphics.contour['pressure_contour'].surfaces_list = [self.rocket]
+        self.solver.results.graphics.contour['pressure_contour'].surfaces_list = [self.wall]
 
     def exit(self):
         # exit session
@@ -116,6 +116,10 @@ class PyFluentSession:
 
         # initialize
         self.solver.solution.initialization.initialize()
+
+        # To double-check values when debugging
+        # uncomment following and set show_gui=True
+        input('Press any key to continue...')
 
         # solve
         self.solver.solution.run_calculation.calculate()
