@@ -14,8 +14,8 @@ class PyFluentSession:
         self.c = Parameters('PyFluent/configs/variable_configs.csv')
 
         # variable for interior and exterior walls and interior
-        self.rocket = 'enclosure-enclosure:1'
-        self.wall = 'enclosure-enclosure:91'
+        self.rocket = 'enclosure-enclosure:91'
+        self.wall = 'enclosure-enclosure:1'
         self.interior = 'interior--enclosure-enclosure'
 
         # Launch session of fluent
@@ -73,7 +73,7 @@ class PyFluentSession:
         # Normally, you will just calculate this after the iterations have run, but for simplicity it is calculated
         # every iteration alongside drag, in the same folder. Effects on performance are unknown
         self.solver.solution.report_definitions.single_val_expression.create('centre-of-pressure')
-        self.solver.solution.report_definitions.single_val_expression['centre-of-pressure'].define = f"AreaInt(y*PressureCoefficient,['{self.wall}'])/AreaInt(PressureCoefficient,['{self.wall}'])"
+        self.solver.solution.report_definitions.single_val_expression['centre-of-pressure'].define = f"AreaInt(y*PressureCoefficient,['{self.rocket}'])/AreaInt(PressureCoefficient,['{self.rocket}'])"
 
         # set iterations
         self.solver.solution.run_calculation.iter_count = p.number_of_iterations
@@ -81,12 +81,12 @@ class PyFluentSession:
         # create velocity contours
         self.solver.results.graphics.contour.create('velocity_contour')
         self.solver.results.graphics.contour['velocity_contour'].field = 'velocity-magnitude'
-        self.solver.results.graphics.contour['velocity_contour'].surfaces_list = [self.wall]
+        self.solver.results.graphics.contour['velocity_contour'].surfaces_list = [self.rocket]
 
         # create pressure contours
         self.solver.results.graphics.contour.create('pressure_contour')
         self.solver.results.graphics.contour['pressure_contour'].field = 'pressure'
-        self.solver.results.graphics.contour['pressure_contour'].surfaces_list = [self.wall]
+        self.solver.results.graphics.contour['pressure_contour'].surfaces_list = [self.rocket]
 
     def exit(self):
         # exit session
@@ -97,7 +97,6 @@ class PyFluentSession:
         # Set density and viscosity of air
         self.solver.setup.materials.fluid['air'].density.value = self.c.air_density
         self.solver.setup.materials.fluid['air'].viscosity.value = self.c.air_viscosity
-
 
         # Setup inlet velocity-vector magnitudes
         self.solver.setup.boundary_conditions.velocity_inlet['inlet'].velocity_spec = 'Components'

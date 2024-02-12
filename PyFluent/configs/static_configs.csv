@@ -3,6 +3,6 @@ residual_x_velocity,1e-4
 residual_y_velocity,1e-4
 residual_k,1e-4
 residual_omega,1e-4
-number_of_iterations,10
-drag_force_monitor_zone,'enclosure-enclosure:1'
-roughness_constant,5e-6
+number_of_iterations,100
+drag_force_monitor_zone,'enclosure-enclosure:91'
+roughness_constant,2e-5
