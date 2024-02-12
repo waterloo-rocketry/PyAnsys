@@ -1,4 +1,4 @@
-wall,enclosure-enclosure:85
+wall,enclosure-enclosure:91
 pressure-outlet,outlet
 interior,interior--enclosure-enclosure
 velocity-inlet,inlet
