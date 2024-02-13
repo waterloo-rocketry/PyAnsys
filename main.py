@@ -31,7 +31,7 @@ def configure(line):
     cdf.iloc[[4], [1]] = 0  # z velocity
     cdf.iloc[[5], [1]] = -df.iloc[line]['velocity']  # velocity magnitude
     cdf.iloc[[6], [1]] = velocity_vectors_from_angle_of_attack(df.iloc[line]['angle_of_attack'], 1)[1]  # drag x velocity
-    cdf.iloc[[7], [1]] = -velocity_vectors_from_angle_of_attack(df.iloc[line]['angle_of_attack'], 1) [0] # drag y velocity
+    cdf.iloc[[7], [1]] = -velocity_vectors_from_angle_of_attack(df.iloc[line]['angle_of_attack'], 1)[0] # drag y velocity
     cdf.iloc[[8], [1]] = 0  # drag z velocity
 
     # dump configurations data frame in variable_configs vile
@@ -49,29 +49,28 @@ def main():
 
     # Determine how many simulations to run by checking how many lines are in inputs file
     with open('inputs.csv', 'r') as in_file:
-
         # subtract one line for the header
         num_of_sims = len(in_file.readlines()) - 1
 
-        # create session
-        session = PyFluentSession()
+    # create session
+    session = PyFluentSession()
 
-        # For every sim case, run a sim
-        for i in range(0, num_of_sims):
-            # set variable configurations and folder name
-            file_name = configure(i)
+    # For every sim case, run a sim
+    for i in range(0, num_of_sims):
+        # set variable configurations and folder name
+        file_name = configure(i)
 
-            # run sim
-            session.run_sims(file_name)
+        # run sim
+        session.run_sims(file_name)
 
-            # read report file and upload to outputs.csv
-            retrieve_date(f'report-{file_name}.out')
+        # read report file and upload to outputs.csv
+        retrieve_date(f'report-{file_name}.out')
 
-        # exit Fluent
-        session.exit()
+    # exit Fluent
+    session.exit()
 
-        # move files into Logs directory
-        organize_files()
+    # move files into Logs directory
+    organize_files()
 
 
 if __name__ == '__main__':

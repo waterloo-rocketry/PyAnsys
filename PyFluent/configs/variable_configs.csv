@@ -1,9 +1,9 @@
-air_density,1.2133122725852645
-air_viscosity,1.7862470838506973e-05
-inlet_x_velocity,-27.893451546568876
-inlet_y_velocity,2.4403607969344296
+air_density,0.5969544237546975
+air_viscosity,1.5647164069318896e-05
+inlet_x_velocity,-28.02994898318392
+inlet_y_velocity,-228.28561487750406
 inlet_z_velocity,0.0
-air_velocity,0
-drag_force_monitor_x_vector,0
-drag_force_monitor_y_vector,-1
-drag_force_monitor_z_vector,0
+air_velocity,230.0
+drag_force_monitor_x_vector,0.12186934340514748
+drag_force_monitor_y_vector,-0.992546151641322
+drag_force_monitor_z_vector,0.0
