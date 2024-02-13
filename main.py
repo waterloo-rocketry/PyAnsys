@@ -51,6 +51,10 @@ def main():
         # create session
         session = PyFluentSession()
 
+        # clear output file
+        with open('outputs.csv', 'w') as outfile:
+            outfile.write('drag_force,centre_of_pressure\n')
+
         # For every sim case, run a sim
         for i in range(0, num_of_sims):
             # set variable configurations and folder name
