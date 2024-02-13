@@ -13,8 +13,8 @@ class PyFluentSession:
         p = Parameters('PyFluent/configs/static_configs.csv')
 
         # variable for interior and exterior walls and interior
-        self.rocket = 'enclosure-enclosure:1'
-        self.wall = 'enclosure-enclosure:85'
+        self.rocket = 'enclosure-enclosure:91'
+        self.wall = 'enclosure-enclosure:1'
         self.interior = 'interior--enclosure-enclosure'
 
         # Launch session of fluent
@@ -55,13 +55,12 @@ class PyFluentSession:
         # continuity, x-vel, y-vel, k, omega
         self.solver.tui.solve.monitors.residual.convergence_criteria(p.residual_continuity, p.residual_x_velocity, p.residual_y_velocity, p.residual_k, p.residual_omega)
 
-        # set reference values
+        # set static reference values
         set_reference_values(self.solver, 'PyFluent/configs/reference_values.csv')
 
         # Create drag force monitor
         self.solver.solution.report_definitions.drag.create('drag-report')  # New report definition
-        self.solver.solution.report_definitions.drag['drag-report'].force_vector = [p.drag_coef_monitor_x_vector, p.drag_coef_monitor_y_vector, p.drag_coef_monitor_z_vector]  # Set x, y, z force vectors
-        self.solver.solution.report_definitions.drag['drag-report'].thread_names = p.drag_coef_monitor_zone  # select zone
+        self.solver.solution.report_definitions.drag['drag-report'].thread_names = p.drag_force_monitor_zone  # select zone
         self.solver.solution.report_definitions.drag['drag-report'].scaled = False  # set to drag force from drag coef.
 
         # Create centre of pressure monitor
@@ -88,12 +87,20 @@ class PyFluentSession:
         self.solver.exit()
 
     def run_sims(self, report_file):
+
         p = Parameters('PyFluent/configs/variable_configs.csv')
 
         # Set density and viscosity of air
         self.solver.setup.materials.fluid['air'].density.value = p.air_density
         self.solver.setup.materials.fluid['air'].viscosity.value = p.air_viscosity
 
+        # manually set variable reference values
+        self.solver.setup.reference_values.velocity = p.air_velocity
+        self.solver.setup.reference_values.viscosity = p.air_viscosity
+        self.solver.setup.reference_values.density = p.air_density
+
+        # change drag vector components
+        self.solver.solution.report_definitions.drag['drag-report'].force_vector = [p.drag_force_monitor_x_vector, p.drag_force_monitor_y_vector, p.drag_force_monitor_z_vector]  # Set x, y, z force vectors
 
         # Setup inlet velocity-vector magnitudes
         self.solver.setup.boundary_conditions.velocity_inlet['inlet'].velocity_spec = 'Components'
@@ -107,11 +114,15 @@ class PyFluentSession:
         self.solver.solution.monitor.report_files['report-file'].print = True
         self.solver.solution.monitor.report_files['report-file'].file_name = f'report-{report_file}'
 
+        # initialize
+        self.solver.solution.initialization.initialize()
+
         # initialization values in hybrid initialization
         self.solver.solution.initialization.hybrid_initialize()
 
-        # initialize
-        self.solver.solution.initialization.initialize()
+        # To double-check values when debugging
+        # uncomment following and set show_gui=True
+        #input('Press any key to continue...')
 
         # solve
         self.solver.solution.run_calculation.calculate()

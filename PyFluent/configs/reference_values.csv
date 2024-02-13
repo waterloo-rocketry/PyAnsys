@@ -1,10 +1,7 @@
 area,0.018241
-density,1.225
 enthalpy,0
-length,0.152
+length,4.191
 pressure,0
 temperature,288.16
-velocity,274.4
-viscosity,1.7894e-5
 yplus,300
 zone,'enclosure-enclosure'

@@ -20,18 +20,19 @@ def configure(line):
     density_viscosity = calculate_atmospheric_properties(df.iloc[line]['altitude'])
     velocity = velocity_vectors_from_angle_of_attack(df.iloc[line]['angle_of_attack'], df.iloc[line]['velocity'])
 
-    # Update the reference values file
-    update_reference("configs/reference_values.csv", density_viscosity, df.iloc[line]['velocity'])
-
     # create new data frame for configurations file by reading variable_configs file
     cdf = pd.read_csv('PyFluent/configs/variable_configs.csv', header=None)
 
     # update values in configurations data frame
     cdf.iloc[[0], [1]] = density_viscosity[1]  # air density
     cdf.iloc[[1], [1]] = density_viscosity[3]  # air viscosity
-    cdf.iloc[[2], [1]] = velocity[0]  # x velocity
-    cdf.iloc[[3], [1]] = velocity[1]  # y velocity
+    cdf.iloc[[2], [1]] = velocity[1]  # x velocity
+    cdf.iloc[[3], [1]] = velocity[0]  # y velocity
     cdf.iloc[[4], [1]] = 0  # z velocity
+    cdf.iloc[[5], [1]] = -df.iloc[line]['velocity']  # velocity magnitude
+    cdf.iloc[[6], [1]] = velocity_vectors_from_angle_of_attack(df.iloc[line]['angle_of_attack'], 1)[1]  # drag x velocity
+    cdf.iloc[[7], [1]] = -velocity_vectors_from_angle_of_attack(df.iloc[line]['angle_of_attack'], 1)[0] # drag y velocity
+    cdf.iloc[[8], [1]] = 0  # drag z velocity
 
     # dump configurations data frame in variable_configs vile
     cdf.to_csv('PyFluent/configs/variable_configs.csv', sep=',', encoding='utf-8', index=False, header=False)
@@ -48,29 +49,28 @@ def main():
 
     # Determine how many simulations to run by checking how many lines are in inputs file
     with open('inputs.csv', 'r') as in_file:
-
         # subtract one line for the header
         num_of_sims = len(in_file.readlines()) - 1
 
-        # create session
-        session = PyFluentSession()
+    # create session
+    session = PyFluentSession()
 
-        # For every sim case, run a sim
-        for i in range(0, num_of_sims):
-            # set variable configurations and folder name
-            file_name = configure(i)
+    # For every sim case, run a sim
+    for i in range(0, num_of_sims):
+        # set variable configurations and folder name
+        file_name = configure(i)
 
-            # run sim
-            session.run_sims(file_name)
+        # run sim
+        session.run_sims(file_name)
 
-            # read report file and upload to outputs.csv
-            retrieve_date(f'report-{file_name}.out')
+        # read report file and upload to outputs.csv
+        retrieve_date(f'report-{file_name}.out')
 
-        # exit Fluent
-        session.exit()
+    # exit Fluent
+    session.exit()
 
-        # move files into Logs directory
-        organize_files()
+    # move files into Logs directory
+    organize_files()
 
 
 if __name__ == '__main__':
