@@ -1,6 +1,10 @@
 # PyAnsys
 Automating Ansys Fluent CFD simulations
 
+This project is tailored for Waterloo Rocketry's 2024 Rocket, Borealis. A lot of parameters are custom-set.
+Using this software for your simulations is not recommended until further documentation is written.
+This software is provided as-is.
+
 ## Requirements
 1. Working installation of ``Ansys Fluent``
 2. ``Python`` (Developed on 3.9)
