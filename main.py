@@ -55,6 +55,10 @@ def main():
     # create session
     session = PyFluentSession()
 
+    # clear output file
+    with open('outputs.csv', 'w') as outfile:
+        outfile.write('alt_vel_aoa,drag_force,centre_of_pressure\n')
+
     # For every sim case, run a sim
     for i in range(0, num_of_sims):
         # set variable configurations and folder name
@@ -64,7 +68,7 @@ def main():
         session.run_sims(file_name)
 
         # read report file and upload to outputs.csv
-        retrieve_date(f'report-{file_name}.out')
+        retrieve_data(file_name)
 
     # exit Fluent
     session.exit()
