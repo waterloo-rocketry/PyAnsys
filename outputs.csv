@@ -1,1 +1,2 @@
-drag_force,centre_of_pressure
+alt_vel_aoa,drag_force,centre_of_pressure
+1,1,2

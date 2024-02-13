@@ -64,7 +64,7 @@ def main():
             session.run_sims(file_name)
 
             # read report file and upload to outputs.csv
-            retrieve_data(f'report-{file_name}')
+            retrieve_data(file_name)
 
         # move files into Logs directory
         organize_files()
