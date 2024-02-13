@@ -7,7 +7,7 @@ Reads data from report file and appends it to output.csv
 """
 
 
-def retrieve_date(report_file):
+def retrieve_data(report_file):
 
     # read report file
     with open(report_file, 'r') as report_file:
