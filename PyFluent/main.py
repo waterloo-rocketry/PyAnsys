@@ -69,6 +69,14 @@ class PyFluentSession:
         self.solver.solution.report_definitions.single_val_expression.create('centre-of-pressure')
         self.solver.solution.report_definitions.single_val_expression['centre-of-pressure'].define = f"AreaInt(y*PressureCoefficient,['{self.rocket}'])/AreaInt(PressureCoefficient,['{self.rocket}'])"
 
+        # set convergence criteria for drag-force and centre-of-pressure
+        self.solver.solution.monitor.convergence_conditions.convergence_reports['drag-convergence'] = {}
+        self.solver.solution.monitor.convergence_conditions.convergence_reports['drag-convergence'].report_defs = 'drag-report'
+        self.solver.solution.monitor.convergence_conditions.convergence_reports['drag-convergence'].stop_criterion = p.drag_convergence
+        self.solver.solution.monitor.convergence_conditions.convergence_reports['cop-convergence'] = {}
+        self.solver.solution.monitor.convergence_conditions.convergence_reports['cop-convergence'].report_defs = 'centre-of-pressure'
+        self.solver.solution.monitor.convergence_conditions.convergence_reports['cop-convergence'].stop_criterion = p.cop_convergence
+
         # set iterations
         self.solver.solution.run_calculation.iter_count = p.number_of_iterations
 
