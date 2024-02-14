@@ -1,4 +1,5 @@
 import os
+import shutil
 from time import sleep
 from datetime import datetime
 
@@ -25,6 +26,9 @@ def organize_files():
         # if directory already exists, overwrite
         for file in os.listdir(f'./Logs/{folder_name}'):
             os.remove(f'./Logs/{folder_name}/{file}')
+
+    # make copy of outputs.csv into log folder
+    shutil.copy('./outputs.csv', f'outputs-{folder_name}.csv')
 
     # move all files not in static_files into the new directory
     for file in os.listdir():

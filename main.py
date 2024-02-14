@@ -26,11 +26,11 @@ def configure(line):
     # update values in configurations data frame
     cdf.iloc[[0], [1]] = density_viscosity[1]  # air density
     cdf.iloc[[1], [1]] = density_viscosity[3]  # air viscosity
-    cdf.iloc[[2], [1]] = velocity[1]  # x velocity
-    cdf.iloc[[3], [1]] = velocity[0]  # y velocity
+    cdf.iloc[[2], [1]] = -velocity[1]  # x velocity
+    cdf.iloc[[3], [1]] = -velocity[0]  # y velocity
     cdf.iloc[[4], [1]] = 0  # z velocity
-    cdf.iloc[[5], [1]] = -df.iloc[line]['velocity']  # velocity magnitude
-    cdf.iloc[[6], [1]] = velocity_vectors_from_angle_of_attack(df.iloc[line]['angle_of_attack'], 1)[1]  # drag x velocity
+    cdf.iloc[[5], [1]] = df.iloc[line]['velocity']  # velocity magnitude
+    cdf.iloc[[6], [1]] = -velocity_vectors_from_angle_of_attack(df.iloc[line]['angle_of_attack'], 1)[1]  # drag x velocity
     cdf.iloc[[7], [1]] = -velocity_vectors_from_angle_of_attack(df.iloc[line]['angle_of_attack'], 1)[0] # drag y velocity
     cdf.iloc[[8], [1]] = 0  # drag z velocity
 
@@ -55,6 +55,10 @@ def main():
     # create session
     session = PyFluentSession()
 
+    # clear output file
+    with open('outputs.csv', 'w') as outfile:
+        outfile.write('alt_vel_aoa,drag_force,centre_of_pressure\n')
+
     # For every sim case, run a sim
     for i in range(0, num_of_sims):
         # set variable configurations and folder name
@@ -64,7 +68,7 @@ def main():
         session.run_sims(file_name)
 
         # read report file and upload to outputs.csv
-        retrieve_date(f'report-{file_name}.out')
+        retrieve_data(file_name)
 
     # exit Fluent
     session.exit()

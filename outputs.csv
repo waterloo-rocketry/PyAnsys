@@ -1,5 +1,2 @@
-drag_force,centre_of_pressure
--36.92846,2.231364
-498.4094,0.6568329
-234.6429,1.016801
-191.898,0.02443887
+alt_vel_aoa,drag_force,centre_of_pressure
+1,1,1
