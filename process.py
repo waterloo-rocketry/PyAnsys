@@ -10,8 +10,8 @@ Reads data from report file and appends it to output.csv
 def retrieve_data(report_file):
 
     # read report file
-    with open(f'report-{report_file}.out', 'r') as report_file:
-        file = report_file.readlines()
+    with open(f'report-{report_file}.out', 'r') as outfile:
+        file = outfile.readlines()
 
         # read last line
         file = file[-1:][0].replace('\n', '')
