@@ -6,3 +6,5 @@ residual_omega,1e-4
 number_of_iterations,100
 drag_force_monitor_zone,'enclosure-enclosure:91'
 roughness_constant,2e-5
+drag_convergence,1e-1
+cop_convergence,1e-2
