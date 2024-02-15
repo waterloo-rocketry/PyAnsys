@@ -39,7 +39,29 @@ def configure(line):
 
     # return alt-vel-aoa as a string to be used as report file name
     # covert to int because filename can't contain "."
-    return f"{int(df.iloc[line]['altitude'])}-{int(df.iloc[line]['angle_of_attack'])}-{int(df.iloc[line]['velocity'])}"
+    return f"{int(df.iloc[line]['altitude'])}-{int(df.iloc[line]['velocity'])}-{int(df.iloc[line]['angle_of_attack'])}"
+
+
+# function which runs all simulations on a given mesh
+def run_simulations(num_of_sims, mesh):
+    # create session
+    session = PyFluentSession(mesh)
+
+    # For every sim case, run a sim
+    for i in range(0, num_of_sims):
+        # set variable configurations and folder name
+        file_name = configure(i)
+
+        print(f'{mesh}\t{file_name}')
+
+        # run sim
+        session.run_sims(file_name)
+
+        # read report file and upload to outputs.csv
+        retrieve_data(file_name, mesh.replace('.msh', '').replace('.h5', ''))
+
+    # exit Fluent
+    session.exit()
 
 
 # Main function for the entire program
@@ -52,29 +74,23 @@ def main():
         # subtract one line for the header
         num_of_sims = len(in_file.readlines()) - 1
 
-    # create session
-    session = PyFluentSession()
-
     # clear output file
     with open('outputs.csv', 'w') as outfile:
-        outfile.write('alt_vel_aoa,drag_force,centre_of_pressure\n')
+        outfile.write('mesh,alt_vel_aoa,drag_force,centre_of_pressure\n')
 
-    # For every sim case, run a sim
-    for i in range(0, num_of_sims):
-        # set variable configurations and folder name
-        file_name = configure(i)
+    # create log folder
+    log_folder = new_log_folder()
 
-        # run sim
-        session.run_sims(file_name)
+    # runs simulations for every mesh
+    for mesh in os.listdir('PyFluent/mesh'):
+        run_simulations(num_of_sims, mesh)
 
-        # read report file and upload to outputs.csv
-        retrieve_data(file_name)
+        # move files into Logs directory
+        organize_files(log_folder, mesh.replace('.msh', '').replace('.h5', ''))
 
-    # exit Fluent
-    session.exit()
-
-    # move files into Logs directory
-    organize_files()
+    # make copy of outputs.csv into log folder
+    shutil.copy('./outputs.csv', f'outputs-{log_folder}.csv')
+    os.rename(f'outputs-{log_folder}.csv', f'Logs/{log_folder}/outputs-{log_folder}.csv')
 
 
 if __name__ == '__main__':

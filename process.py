@@ -7,7 +7,7 @@ Reads data from report file and appends it to output.csv
 """
 
 
-def retrieve_data(report_file):
+def retrieve_data(report_file, mesh):
 
     # read report file
     with open(f'report-{report_file}.out', 'r') as outfile:
@@ -22,7 +22,7 @@ def retrieve_data(report_file):
 
     # create df of current output file and new df for row to be appended
     df = pd.read_csv('outputs.csv')
-    new_row = pd.DataFrame([{'alt_vel_aoa': report_file, 'drag_force': drag, 'centre_of_pressure': cop}])
+    new_row = pd.DataFrame([{'mesh': mesh, 'alt_vel_aoa': report_file, 'drag_force': drag, 'centre_of_pressure': cop}])
 
     # append row
     df = pd.concat([df, new_row], ignore_index=True)

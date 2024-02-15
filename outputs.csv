@@ -1,2 +1,2 @@
-alt_vel_aoa,drag_force,centre_of_pressure
-1,1,1
+mesh,alt_vel_aoa,drag_force,centre_of_pressure
+mesh_file,1000-274-0,447.14,0.9198649
