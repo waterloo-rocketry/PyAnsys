@@ -1,9 +1,9 @@
 # PyAnsys
 Automating Ansys Fluent CFD simulations
 
-This project is tailored for Waterloo Rocketry's 2024 Rocket, Borealis. A lot of parameters are custom-set.
-Using this software for your simulations is not recommended until further documentation is written.
-This software is provided as-is.
+The code is currently for the 2024 Rocket, Borealis. A lot of parameters are custom-set.
+Using this software for other simulations is not recommended until some documentation is written.
+
 
 ## Requirements
 1. Working installation of ``Ansys Fluent``
@@ -12,11 +12,11 @@ This software is provided as-is.
 ## Setup
 1. ``git clone https://github.com/waterloo-rocketry/PyAnsys.git``
 2. ``pip install -r requirements.txt``
-3. Place your mesh file in ``PyFluent/`` folder, must be names ``mesh_file``
+3. Place your mesh file(s) in ``PyFluent/mesh/``
 4. Setup configurations by modifying csv files in ``PyFluent/configs/`` folder (no need to edit ``variable_configs.csv`` however)
 5. Add all input cases into ``inputs.csv``
 6. ``python main.py``
-7. Results should appear in ``outputs.csv``, contours and transcripts are available in ``Logs/alt-vel-aoa/``
+7. Results should appear in ``outputs.csv`` alongside contours and transcripts in ``Logs/alt-vel-aoa/``
 
 ## Helpful Links
 
