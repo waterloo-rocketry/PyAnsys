@@ -13,7 +13,7 @@ Using this software for other simulations is not recommended until some document
 1. ``git clone https://github.com/waterloo-rocketry/PyAnsys.git``
 2. ``pip install -r requirements.txt``
 3. Place your mesh file(s) in ``PyFluent/mesh/``
-4. Setup configurations by modifying csv files in ``PyFluent/configs/`` folder (no need to edit ``variable_configs.csv`` however)
+4. Setup configurations by modifying csv files in ``PyFluent/configs/`` folder (no need to edit ``variable_configs.csv``)
 5. Add all input cases into ``inputs.csv``
 6. ``python main.py``
 7. Results should appear in ``outputs.csv`` alongside contours and transcripts in ``Logs/alt-vel-aoa/``
