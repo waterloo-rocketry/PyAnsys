@@ -14,9 +14,28 @@ static_files = ['.git', 'file_manager.py', 'inputs.csv', 'Logs', 'main.py', 'PyF
                 'requirements.txt', '__pycache__', 'process.py', 'outputs.csv', 'venv', '.idea']
 
 
-def organize_files():
+def organize_files(folder_name, mesh_name):
 
-    # folder name is timestamp it is created
+    # create folder to store all info relating to mesh
+    os.mkdir(f'./Logs/{folder_name}/{mesh_name}')
+
+    # move all files not in static_files into the new directory
+    for file in os.listdir():
+        if file not in static_files:
+            try:
+                os.rename(f'./{file}', f'./Logs/{folder_name}/{mesh_name}/{file}')
+            except PermissionError:
+                try:
+                    # incase Fluent is still shutting down and a file is being used
+                    sleep(10)
+                    os.rename(f'./{file}', f'./Logs/{folder_name}/{mesh_name}/{file}')
+                except PermissionError as e:
+                    print(e)
+
+
+# creates a new folder to hold all output data in log file
+def new_log_folder():
+    # folder name is timestamp it is created in
     folder_name = str(datetime.now())[:-7].replace(':', '-')
 
     # create folder inside Logs
@@ -27,18 +46,4 @@ def organize_files():
         for file in os.listdir(f'./Logs/{folder_name}'):
             os.remove(f'./Logs/{folder_name}/{file}')
 
-    # make copy of outputs.csv into log folder
-    shutil.copy('./outputs.csv', f'outputs-{folder_name}.csv')
-
-    # move all files not in static_files into the new directory
-    for file in os.listdir():
-        if file not in static_files:
-            try:
-                os.rename(f'./{file}', f'./Logs/{folder_name}/{file}')
-            except PermissionError:
-                try:
-                    # incase Fluent is still shutting down and a file is being used
-                    sleep(10)
-                    os.rename(f'./{file}', f'./Logs/{folder_name}/{file}')
-                except PermissionError as e:
-                    print(e)
+    return folder_name

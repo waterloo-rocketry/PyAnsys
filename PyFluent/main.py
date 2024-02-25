@@ -8,7 +8,7 @@ from PyFluent.fluentcommands import *
 # It is highly recommended that you are familiar with Fluent CFD simulations
 # before attempting to make any modifications to this code
 class PyFluentSession:
-    def __init__(self):
+    def __init__(self, mesh_file):
         # Import all configurations from csv files in configs folder
         p = Parameters('PyFluent/configs/static_configs.csv')
 
@@ -23,11 +23,7 @@ class PyFluentSession:
         self.solver = pyfluent.launch_fluent(show_gui=False, precision='single', version='3d', mode='solver', product_version='23.2.0', gpu=False, processor_count=30)
 
         # Read mesh file
-        # Sometimes does not have .h5 extension, mainly when using student version
-        try:
-            self.solver.file.read_mesh(file_name='PyFluent/mesh_file.msh.h5', file_type='mesh')
-        except RuntimeError:
-            self.solver.file.read_mesh(file_name='PyFluent/mesh_file.msh', file_type='mesh')
+        self.solver.file.read_mesh(file_name=f'PyFluent/mesh/{mesh_file}', file_type='mesh')
 
         # Check mesh
         self.solver.mesh.check()
