@@ -5,3 +5,5 @@ inputs.csv
 inputs.csv
 *.h5
 *.xml
+*.csv
+*.msh
