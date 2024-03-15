@@ -1,2 +1,7 @@
 \__pycache__
 .idea
+*.csv
+inputs.csv
+inputs.csv
+*.h5
+*.xml
